@@ -1,0 +1,13 @@
+node_modules
+.idea
+.vscode
+.env
+app/build
+build
+coverage
+
+build/
+dist/
+.secret-*
+
+yarn-error.log
