@@ -65,7 +65,7 @@ function JSpreadsheetComponent() {
         toolbar: true,
         tabs: true,
         editable: true,
-        fullscreen: true,
+        fullscreen: false,
         tableOverflow: true,
         tableWidth: '100%',
         tableHeight: '500px',
