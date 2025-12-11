@@ -1,4 +1,4 @@
-import { useState } from 'react';
+
 import { 
   SpreadsheetComponent, 
   SheetsDirective, 
@@ -13,13 +13,70 @@ import {
   CellDirective
 } from '@syncfusion/ej2-react-spreadsheet';
 import { registerLicense } from '@syncfusion/ej2-base';
+import { useRef, useEffect } from 'react';
+import jspreadsheet from 'jspreadsheet';
+import 'jspreadsheet/dist/jspreadsheet.css';
+import 'jsuites/dist/jsuites.css';
 import './App.css';
 
 // Register Syncfusion license
-registerLicense('Ngo9BigBOggjHTQxAR8/V1JFaF1cXGFCf1FpR2RGfV5ycUVHYlZSQnxaQ00DNHVRdkdmWH5cd3VXQmJYVUJwVkZWYEg=');
+const syncfusionLicense = import.meta.env.VITE_SYNCFUSION_LICENSE;
+if (syncfusionLicense) {
+  registerLicense(syncfusionLicense);
+}
+
+// Set jspreadsheet license
+const jspreadsheetLicense = import.meta.env.VITE_JSPREADSHEET_LICENSE;
+if (jspreadsheetLicense) {
+  jspreadsheet.setLicense(jspreadsheetLicense);
+}
+
+// Type declaration for jspreadsheet
+declare module 'react' {
+  interface HTMLDivElement {
+    jspreadsheet?: any;
+  }
+}
+
+// JSpreadsheet Component
+function JSpreadsheetComponent() {
+  const jssRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (jssRef.current && !(jssRef.current as any).jspreadsheet) {
+      jspreadsheet(jssRef.current, {
+        worksheets: [{
+          data: [
+            ['Product', 'Price', 'Quantity', 'Total'],
+            ['Laptop', 1200, 2, '=B2*C2'],
+            ['Mouse', 25, 5, '=B3*C3'],
+            ['Keyboard', 80, 3, '=B4*C4'],
+            ['Monitor', 300, 1, '=B5*C5'],
+            ['Headphones', 150, 2, '=B6*C6'],
+          ],
+          minDimensions: [10, 10],
+          columns: [
+            { width: 150 },
+            { width: 100, mask: '#,##0.00' },
+            { width: 100 },
+            { width: 100, mask: '#,##0.00' },
+          ],
+        }],
+        toolbar: true,
+        tabs: true,
+        editable: true,
+        fullscreen: true,
+        tableOverflow: true,
+        tableWidth: '100%',
+        tableHeight: '500px',
+      });
+    }
+  }, []);
+
+  return <div ref={jssRef} style={{ marginTop: '20px' }} />;
+}
 
 function App() {
-  const [activeTab, setActiveTab] = useState('overview');
 
   // Sample employee data
   const employeeData = [
@@ -49,13 +106,11 @@ function App() {
     { Month: 'June', Income: 5800, Expenses: 3600, Savings: 0, SavingsPercent: 0 },
   ];
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'overview':
-        return (
-          <div className="demo-section">
-            <h2>🎯 Overview - Complete Spreadsheet Demo</h2>
-            <p>This demo showcases comprehensive spreadsheet features including data binding, formulas, formatting, and more.</p>
+  return (
+    <div className="app-container">
+      <main className="main-content">
+         <div className="demo-section">
+            <h2>🎯 Spreadsheet Demo</h2>
             <SpreadsheetComponent
               allowOpen={true}
               allowSave={true}
@@ -169,358 +224,12 @@ function App() {
               </SheetsDirective>
             </SpreadsheetComponent>
           </div>
-        );
-
-      case 'formulas':
-        return (
-          <div className="demo-section">
-            <h2>🔢 Formulas & Calculations</h2>
-            <p>Demonstrates built-in formulas: SUM, AVERAGE, IF, VLOOKUP, and more.</p>
-            <SpreadsheetComponent>
-              <SheetsDirective>
-                <SheetDirective name="Formula Examples">
-                  <RowsDirective>
-                    <RowDirective>
-                      <CellsDirective>
-                        <CellDirective value="Formula Type" style={{ fontWeight: 'bold', backgroundColor: '#217346', color: '#FFF' }}></CellDirective>
-                        <CellDirective value="Example" style={{ fontWeight: 'bold', backgroundColor: '#217346', color: '#FFF' }}></CellDirective>
-                        <CellDirective value="Result" style={{ fontWeight: 'bold', backgroundColor: '#217346', color: '#FFF' }}></CellDirective>
-                      </CellsDirective>
-                    </RowDirective>
-                    <RowDirective>
-                      <CellsDirective>
-                        <CellDirective value="Numbers"></CellDirective>
-                        <CellDirective value="10, 20, 30, 40, 50"></CellDirective>
-                      </CellsDirective>
-                    </RowDirective>
-                    <RowDirective>
-                      <CellsDirective>
-                        <CellDirective value="SUM"></CellDirective>
-                        <CellDirective value="=SUM(10,20,30,40,50)"></CellDirective>
-                        <CellDirective formula="=SUM(10,20,30,40,50)"></CellDirective>
-                      </CellsDirective>
-                    </RowDirective>
-                    <RowDirective>
-                      <CellsDirective>
-                        <CellDirective value="AVERAGE"></CellDirective>
-                        <CellDirective value="=AVERAGE(10,20,30,40,50)"></CellDirective>
-                        <CellDirective formula="=AVERAGE(10,20,30,40,50)"></CellDirective>
-                      </CellsDirective>
-                    </RowDirective>
-                    <RowDirective>
-                      <CellsDirective>
-                        <CellDirective value="MAX"></CellDirective>
-                        <CellDirective value="=MAX(10,20,30,40,50)"></CellDirective>
-                        <CellDirective formula="=MAX(10,20,30,40,50)"></CellDirective>
-                      </CellsDirective>
-                    </RowDirective>
-                    <RowDirective>
-                      <CellsDirective>
-                        <CellDirective value="MIN"></CellDirective>
-                        <CellDirective value="=MIN(10,20,30,40,50)"></CellDirective>
-                        <CellDirective formula="=MIN(10,20,30,40,50)"></CellDirective>
-                      </CellsDirective>
-                    </RowDirective>
-                    <RowDirective>
-                      <CellsDirective>
-                        <CellDirective value="COUNT"></CellDirective>
-                        <CellDirective value="=COUNT(10,20,30,40,50)"></CellDirective>
-                        <CellDirective formula="=COUNT(10,20,30,40,50)"></CellDirective>
-                      </CellsDirective>
-                    </RowDirective>
-                    <RowDirective>
-                      <CellsDirective>
-                        <CellDirective value="IF Statement"></CellDirective>
-                        <CellDirective value={'=IF(50>30,"Pass","Fail")'}></CellDirective>
-                        <CellDirective formula={'=IF(50>30,"Pass","Fail")'}></CellDirective>
-                      </CellsDirective>
-                    </RowDirective>
-                    <RowDirective>
-                      <CellsDirective>
-                        <CellDirective value="CONCATENATE"></CellDirective>
-                        <CellDirective value={'=CONCATENATE("Hello"," ","World")'}></CellDirective>
-                        <CellDirective formula={'=CONCATENATE("Hello"," ","World")'}></CellDirective>
-                      </CellsDirective>
-                    </RowDirective>
-                    <RowDirective>
-                      <CellsDirective>
-                        <CellDirective value="ROUND"></CellDirective>
-                        <CellDirective value="=ROUND(3.14159,2)"></CellDirective>
-                        <CellDirective formula="=ROUND(3.14159,2)"></CellDirective>
-                      </CellsDirective>
-                    </RowDirective>
-                    <RowDirective>
-                      <CellsDirective>
-                        <CellDirective value="TODAY"></CellDirective>
-                        <CellDirective value="=TODAY()"></CellDirective>
-                        <CellDirective formula="=TODAY()"></CellDirective>
-                      </CellsDirective>
-                    </RowDirective>
-                  </RowsDirective>
-                  <ColumnsDirective>
-                    <ColumnDirective width={150}></ColumnDirective>
-                    <ColumnDirective width={250}></ColumnDirective>
-                    <ColumnDirective width={150}></ColumnDirective>
-                  </ColumnsDirective>
-                </SheetDirective>
-              </SheetsDirective>
-            </SpreadsheetComponent>
+          <div className="demo-section" style={{ marginTop: 40 }}>
+            <h2>🚀 JSpreadsheet Demo</h2>
+            <p>This demo showcases JSpreadsheet integration with React.</p>
+            <JSpreadsheetComponent />
           </div>
-        );
-
-      case 'formatting':
-        return (
-          <div className="demo-section">
-            <h2>🎨 Cell Formatting & Styling</h2>
-            <p>Examples of text formatting, number formatting, cell colors, and borders.</p>
-            <SpreadsheetComponent allowCellFormatting={true} allowNumberFormatting={true}>
-              <SheetsDirective>
-                <SheetDirective name="Formatting Demo">
-                  <RowsDirective>
-                    <RowDirective height={40}>
-                      <CellsDirective>
-                        <CellDirective value="Style Type" style={{ fontWeight: 'bold', fontSize: '14pt', backgroundColor: '#217346', color: '#FFF' }}></CellDirective>
-                        <CellDirective value="Example" style={{ fontWeight: 'bold', fontSize: '14pt', backgroundColor: '#217346', color: '#FFF' }}></CellDirective>
-                      </CellsDirective>
-                    </RowDirective>
-                    <RowDirective height={30}>
-                      <CellsDirective>
-                        <CellDirective value="Bold Text"></CellDirective>
-                        <CellDirective value="This is Bold" style={{ fontWeight: 'bold' }}></CellDirective>
-                      </CellsDirective>
-                    </RowDirective>
-                    <RowDirective height={30}>
-                      <CellsDirective>
-                        <CellDirective value="Italic Text"></CellDirective>
-                        <CellDirective value="This is Italic" style={{ fontStyle: 'italic' }}></CellDirective>
-                      </CellsDirective>
-                    </RowDirective>
-                    <RowDirective height={30}>
-                      <CellsDirective>
-                        <CellDirective value="Underline Text"></CellDirective>
-                        <CellDirective value="This is Underlined" style={{ textDecoration: 'underline' }}></CellDirective>
-                      </CellsDirective>
-                    </RowDirective>
-                    <RowDirective height={30}>
-                      <CellsDirective>
-                        <CellDirective value="Text Color"></CellDirective>
-                        <CellDirective value="Colored Text" style={{ color: '#FF0000' }}></CellDirective>
-                      </CellsDirective>
-                    </RowDirective>
-                    <RowDirective height={30}>
-                      <CellsDirective>
-                        <CellDirective value="Background Color"></CellDirective>
-                        <CellDirective value="Highlighted Cell" style={{ backgroundColor: '#FFFF00' }}></CellDirective>
-                      </CellsDirective>
-                    </RowDirective>
-                    <RowDirective height={30}>
-                      <CellsDirective>
-                        <CellDirective value="Currency Format"></CellDirective>
-                        <CellDirective value="1234.56" format="$#,##0.00"></CellDirective>
-                      </CellsDirective>
-                    </RowDirective>
-                    <RowDirective height={30}>
-                      <CellsDirective>
-                        <CellDirective value="Percentage Format"></CellDirective>
-                        <CellDirective value="0.856" format="0.00%"></CellDirective>
-                      </CellsDirective>
-                    </RowDirective>
-                    <RowDirective height={30}>
-                      <CellsDirective>
-                        <CellDirective value="Date Format"></CellDirective>
-                        <CellDirective value="12/10/2025" format="dd/mm/yyyy"></CellDirective>
-                      </CellsDirective>
-                    </RowDirective>
-                    <RowDirective height={30}>
-                      <CellsDirective>
-                        <CellDirective value="Number with Decimals"></CellDirective>
-                        <CellDirective value="123.456789" format="0.00"></CellDirective>
-                      </CellsDirective>
-                    </RowDirective>
-                    <RowDirective height={30}>
-                      <CellsDirective>
-                        <CellDirective value="Text Alignment Right"></CellDirective>
-                        <CellDirective value="Right Aligned" style={{ textAlign: 'right' }}></CellDirective>
-                      </CellsDirective>
-                    </RowDirective>
-                    <RowDirective height={30}>
-                      <CellsDirective>
-                        <CellDirective value="Text Alignment Center"></CellDirective>
-                        <CellDirective value="Center Aligned" style={{ textAlign: 'center' }}></CellDirective>
-                      </CellsDirective>
-                    </RowDirective>
-                  </RowsDirective>
-                  <ColumnsDirective>
-                    <ColumnDirective width={200}></ColumnDirective>
-                    <ColumnDirective width={300}></ColumnDirective>
-                  </ColumnsDirective>
-                </SheetDirective>
-              </SheetsDirective>
-            </SpreadsheetComponent>
-          </div>
-        );
-
-      case 'features':
-        return (
-          <div className="demo-section">
-            <h2>⚡ Advanced Features</h2>
-            <p>Data validation, conditional formatting, merge cells, freeze panes, and more.</p>
-            <SpreadsheetComponent 
-              allowDataValidation={true}
-              allowConditionalFormat={true}
-              allowMerge={true}
-              allowHyperlink={true}
-            >
-              <SheetsDirective>
-                <SheetDirective name="Advanced Features">
-                  <RowsDirective>
-                    <RowDirective height={40}>
-                      <CellsDirective>
-                        <CellDirective value="Feature Demonstrations" colSpan={3} style={{ 
-                          fontWeight: 'bold', 
-                          fontSize: '16pt', 
-                          backgroundColor: '#E7E6E6',
-                          textAlign: 'center'
-                        }}></CellDirective>
-                      </CellsDirective>
-                    </RowDirective>
-                    <RowDirective height={30}>
-                      <CellsDirective>
-                        <CellDirective value="Feature" style={{ fontWeight: 'bold', backgroundColor: '#217346', color: '#FFF' }}></CellDirective>
-                        <CellDirective value="Description" style={{ fontWeight: 'bold', backgroundColor: '#217346', color: '#FFF' }}></CellDirective>
-                        <CellDirective value="Example" style={{ fontWeight: 'bold', backgroundColor: '#217346', color: '#FFF' }}></CellDirective>
-                      </CellsDirective>
-                    </RowDirective>
-                    <RowDirective>
-                      <CellsDirective>
-                        <CellDirective value="Hyperlink"></CellDirective>
-                        <CellDirective value="Click to visit website"></CellDirective>
-                        <CellDirective value="Visit Syncfusion" hyperlink="https://www.syncfusion.com"></CellDirective>
-                      </CellsDirective>
-                    </RowDirective>
-                    <RowDirective>
-                      <CellsDirective>
-                        <CellDirective value="Data Validation"></CellDirective>
-                        <CellDirective value="Dropdown list (1-10)"></CellDirective>
-                        <CellDirective value="5"></CellDirective>
-                      </CellsDirective>
-                    </RowDirective>
-                    <RowDirective>
-                      <CellsDirective>
-                        <CellDirective value="Conditional Format"></CellDirective>
-                        <CellDirective value="Highlight if > 50"></CellDirective>
-                        <CellDirective value="75" style={{ backgroundColor: '#92D050' }}></CellDirective>
-                      </CellsDirective>
-                    </RowDirective>
-                    <RowDirective>
-                      <CellsDirective>
-                        <CellDirective value="Wrap Text"></CellDirective>
-                        <CellDirective value="This is a very long text that will wrap within the cell to show multiple lines" wrap={true}></CellDirective>
-                        <CellDirective value="Auto-wrapped"></CellDirective>
-                      </CellsDirective>
-                    </RowDirective>
-                    <RowDirective>
-                      <CellsDirective>
-                        <CellDirective value="Sort Data"></CellDirective>
-                        <CellDirective value="Click column header to sort"></CellDirective>
-                        <CellDirective value="✓ Enabled"></CellDirective>
-                      </CellsDirective>
-                    </RowDirective>
-                    <RowDirective>
-                      <CellsDirective>
-                        <CellDirective value="Filter Data"></CellDirective>
-                        <CellDirective value="Filter rows by criteria"></CellDirective>
-                        <CellDirective value="✓ Enabled"></CellDirective>
-                      </CellsDirective>
-                    </RowDirective>
-                    <RowDirective>
-                      <CellsDirective>
-                        <CellDirective value="Find & Replace"></CellDirective>
-                        <CellDirective value="Search and replace text"></CellDirective>
-                        <CellDirective value="Ctrl+F"></CellDirective>
-                      </CellsDirective>
-                    </RowDirective>
-                    <RowDirective>
-                      <CellsDirective>
-                        <CellDirective value="Undo/Redo"></CellDirective>
-                        <CellDirective value="Revert or redo changes"></CellDirective>
-                        <CellDirective value="Ctrl+Z / Ctrl+Y"></CellDirective>
-                      </CellsDirective>
-                    </RowDirective>
-                  </RowsDirective>
-                  <ColumnsDirective>
-                    <ColumnDirective width={150}></ColumnDirective>
-                    <ColumnDirective width={250}></ColumnDirective>
-                    <ColumnDirective width={150}></ColumnDirective>
-                  </ColumnsDirective>
-                </SheetDirective>
-              </SheetsDirective>
-            </SpreadsheetComponent>
-          </div>
-        );
-
-      default:
-        return null;
-    }
-  };
-
-  return (
-    <div className="app-container">
-      <header className="app-header">
-        <h1>📊 Syncfusion React Spreadsheet Demo</h1>
-        <p>Comprehensive demonstration of spreadsheet features and capabilities</p>
-      </header>
-
-      <div className="tab-container">
-        <button 
-          className={`tab-button ${activeTab === 'overview' ? 'active' : ''}`}
-          onClick={() => setActiveTab('overview')}
-        >
-          📋 Overview
-        </button>
-        <button 
-          className={`tab-button ${activeTab === 'formulas' ? 'active' : ''}`}
-          onClick={() => setActiveTab('formulas')}
-        >
-          🔢 Formulas
-        </button>
-        <button 
-          className={`tab-button ${activeTab === 'formatting' ? 'active' : ''}`}
-          onClick={() => setActiveTab('formatting')}
-        >
-          🎨 Formatting
-        </button>
-        <button 
-          className={`tab-button ${activeTab === 'features' ? 'active' : ''}`}
-          onClick={() => setActiveTab('features')}
-        >
-          ⚡ Features
-        </button>
-      </div>
-
-      <main className="main-content">
-        {renderContent()}
       </main>
-
-      <footer className="app-footer">
-        <div className="feature-list">
-          <h3>✨ Key Features Demonstrated:</h3>
-          <ul>
-            <li>✅ Data Binding with JSON</li>
-            <li>✅ Built-in Formulas (SUM, AVERAGE, IF, etc.)</li>
-            <li>✅ Cell Formatting & Styling</li>
-            <li>✅ Number & Date Formatting</li>
-            <li>✅ Conditional Formatting</li>
-            <li>✅ Data Validation</li>
-            <li>✅ Sorting & Filtering</li>
-            <li>✅ Find & Replace</li>
-            <li>✅ Hyperlinks</li>
-            <li>✅ Multiple Sheets</li>
-            <li>✅ Open/Save Excel Files</li>
-            <li>✅ Chart Support</li>
-          </ul>
-        </div>
-      </footer>
     </div>
   );
 }
